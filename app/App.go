@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"goat/app/c"
 	"goat/app/template"
 	"goat/goat"
@@ -12,37 +11,67 @@ var todos = []c.Todo{
 	{"Make a WASM Frontend Framework in Go", true},
 }
 
-func App() string {
-	ctx := context.WithValue(context.Background(), "todos", todos)
+type TodoList struct {
+	key   string
+	todos []c.Todo
+}
 
+func (t *TodoList) toggle(i int) {
+	t.todos[i].Completed = !t.todos[i].Completed
+}
+
+func (t *TodoList) addTodo(desc string) {
+	t.todos = append(t.todos, c.Todo{
+		Description: desc,
+	})
+}
+
+func (t *TodoList) removeTodo(i int) {
+	var newTodos []c.Todo
+	for j, todo := range todos {
+		if i != j {
+			newTodos = append(newTodos, todo)
+		}
+	}
+	todos = newTodos
+}
+
+func (t *TodoList) render() string {
+	return goat.HTML(template.TodoList(t.todos))
+}
+
+func (t *TodoList) rerender() {
+	goat.Render(t.key, t.render())
+}
+
+func (t *TodoList) callbacks() {
 	goat.MountFunc("toggleTodo", func(args []js.Value) {
 		i := args[0].Int()
-		todos[i].Completed = !todos[i].Completed
-		ctx := context.WithValue(context.Background(), "todos", todos)
-		goat.Render("TodoList", goat.HTML(template.TodoList(), ctx))
+		t.toggle(i)
+		t.rerender()
 	})
 
 	goat.MountFunc("addTodo", func(args []js.Value) {
 		desc := args[0].String()
-		todos = append(todos, c.Todo{
-			Description: desc,
-		})
-		ctx := context.WithValue(context.Background(), "todos", todos)
-		goat.Render("TodoList", goat.HTML(template.TodoList(), ctx))
+		t.addTodo(desc)
+		t.rerender()
 	})
 
 	goat.MountFunc("removeTodo", func(args []js.Value) {
 		i := args[0].Int()
-		var newTodos []c.Todo
-		for j, todo := range todos {
-			if i != j {
-				newTodos = append(newTodos, todo)
-			}
-		}
-		todos = newTodos
-		ctx := context.WithValue(context.Background(), "todos", todos)
-		goat.Render("TodoList", goat.HTML(template.TodoList(), ctx))
+		t.removeTodo(i)
+		t.rerender()
 	})
+}
 
-	return goat.HTML(template.App(), ctx)
+func App() string {
+
+	todoList := &TodoList{
+		key:   "TodoList",
+		todos: todos,
+	}
+
+	todoList.callbacks()
+
+	return todoList.render()
 }

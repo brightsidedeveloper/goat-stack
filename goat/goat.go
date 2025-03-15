@@ -11,9 +11,13 @@ type TemplJoint interface {
 	Render(context.Context, io.Writer) error
 }
 
-func HTML(j TemplJoint, c context.Context) string {
+func HTML(j TemplJoint) string {
+	return HTMLWithContext(j, context.Background())
+}
+
+func HTMLWithContext(j TemplJoint, ctx context.Context) string {
 	var buf bytes.Buffer
-	err := j.Render(c, &buf)
+	err := j.Render(ctx, &buf)
 	if err != nil {
 		js.Global().Get("console").Call("error", "Error rendering template:", err.Error())
 		return ""

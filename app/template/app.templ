@@ -2,22 +2,9 @@ package template
 
 import "goat/app/c"
 
-templ App() {
-	@Layout() {
-		@TodoList()
-	}
-}
-
-templ Layout() {
-	<div style="font-family: Arial, Helvetica, sans-serif;">
-		<h1 style="color:#223554;">Todos</h1>
-		{ children... }
-	</div>
-}
-
-templ TodoList() {
+templ TodoList(todos []c.Todo) {
 	<ul id="TodoList">
-		for i, todo := range ctx.Value("todos").([]c.Todo) {
+		for i, todo := range todos {
 			<li>
 				{ todo.Description } - 
 				if todo.Completed {
