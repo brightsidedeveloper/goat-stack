@@ -22,6 +22,10 @@ func HTML(j TemplJoint, c context.Context) string {
 	return buf.String()
 }
 
+func Log(args ...any) {
+	js.Global().Get("console").Call("log", args...)
+}
+
 func RenderRoot(html string) {
 	doc := js.Global().Get("document")
 	output := doc.Call("getElementById", "root")

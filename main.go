@@ -3,13 +3,12 @@ package main
 import (
 	"goat/app"
 	"goat/goat"
-	"syscall/js"
 )
 
 func main() {
 	done := make(chan struct{}, 0)
 
-	js.Global().Get("console").Call("log", "Hello from Go WebAssembly!")
+	goat.Log("Hi from WASM!")
 
 	goat.RenderRoot(app.App())
 
