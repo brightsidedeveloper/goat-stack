@@ -11,9 +11,9 @@ type TemplJoint interface {
 	Render(context.Context, io.Writer) error
 }
 
-func HTML(j TemplJoint) string {
+func HTML(j TemplJoint, c context.Context) string {
 	var buf bytes.Buffer
-	err := j.Render(context.Background(), &buf)
+	err := j.Render(c, &buf)
 	if err != nil {
 		js.Global().Get("console").Call("error", "Error rendering template:", err.Error())
 		return ""
@@ -34,8 +34,9 @@ func Render(id string, html string) {
 	output.Set("outerHTML", html)
 }
 
-func MountFunc(name string, f func() string) {
+func MountFunc(name string, f func(args []js.Value)) {
 	js.Global().Set(name, js.FuncOf(func(this js.Value, args []js.Value) any {
-		return f()
+		f(args)
+		return nil
 	}))
 }

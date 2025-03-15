@@ -1,5 +1,7 @@
 package template
 
+import "goat/app/c"
+
 templ App() {
 	@Layout() {
 		@TodoList()
@@ -14,7 +16,20 @@ templ Layout() {
 }
 
 templ TodoList() {
-	<ul>
-		<li>Todo 1</li>
+	<ul id="TodoList">
+		for i, todo := range ctx.Value("todos").([]c.Todo) {
+			<li>
+				{ todo.Description } - 
+				if todo.Completed {
+					Done
+				} else {
+					Not Done
+				}
+				<button onclick={ templ.JSFuncCall("toggleTodo", i) }>Toggle</button>
+				<button onclick={ templ.JSFuncCall("removeTodo", i) }>Remove</button>
+			</li>
+		}
+		<input id="innyput"/>
+		<button onclick={ templ.JSFuncCall("addTodo", templ.JSExpression("document.querySelector('#innyput').value")) }>Add</button>
 	</ul>
 }
