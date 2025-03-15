@@ -1,0 +1,10 @@
+{
+  "go.buildTags": "js,wasm",
+  "go.buildFlags": ["-tags", "js,wasm"],
+  "gopls": {
+    "build.env": {
+      "GOOS": "js",
+      "GOARCH": "wasm"
+    }
+  }
+}

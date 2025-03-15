@@ -1,0 +1,20 @@
+package template
+
+templ App() {
+	@Layout() {
+		@TodoList()
+	}
+}
+
+templ Layout() {
+	<div style="font-family: Arial, Helvetica, sans-serif;">
+		<h1 style="color:#223554;">Todos</h1>
+		{ children... }
+	</div>
+}
+
+templ TodoList() {
+	<ul>
+		<li>Todo 1</li>
+	</ul>
+}
